@@ -16,10 +16,10 @@ UsersModel(db.get_connection()).init_table()
 
 @app.route('/index')
 def index():
-    if 'username' not in session:
-        return redirect('/login')
+    '''if 'username' not in session:
+        return redirect('/login')'''
     news = NewsModel(db.get_connection()).get_all(session['user_id'])
-    return render_template('index.html', username=session['username'], news=news)
+    return render_template('index.html', news=news) # username=session['username']
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -46,7 +46,7 @@ def logout():
     return redirect('/login')
 
 
-@app.route('/signup')
+@app.route('/signup', methods=['GET', 'POST'])
 def signup():
     form = SignUpForm()
     if form.validate_on_submit():
@@ -63,8 +63,8 @@ def signup():
 @app.route('/')
 @app.route('/add_news', methods=['GET', 'POST'])
 def add_news():
-    if 'username' not in session:
-        return redirect('/login')
+    '''if 'username' not in session:
+        return redirect('/login')'''
     form = AddNewsForm()
     if form.validate_on_submit():
         title = form.title.data
@@ -72,13 +72,13 @@ def add_news():
         nm = NewsModel(db.get_connection())
         nm.insert(title, content, session['user_id'])
         return redirect("/index")
-    return render_template('add_news.html', title='Добавление новости', form=form, username=session['username'])
+    return render_template('add_news.html', title='Добавление новости', form=form) # username=session['username'])
 
 
 @app.route('/delete_news/<int:news_id>', methods=['GET'])
 def delete_news(news_id):
-    if 'username' not in session:
-        return redirect('/login')
+    '''if 'username' not in session:
+        return redirect('/login')'''
     nm = NewsModel(db.get_connection())
     nm.delete(news_id)
     return redirect("/index")
