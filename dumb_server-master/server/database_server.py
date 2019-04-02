@@ -17,12 +17,12 @@ UsersModel(db.get_connection()).init_table()
 @app.route('/userbase')
 def userbase():
     users = UsersModel(db.get_connection()).get_all(session['user_id'])
-    return render_template('index.html', news=news)
+    return render_template('index.html', news=users)
 
 @app.route('/index')
 def index():
-    '''if 'username' not in session:
-        return redirect('/login')'''
+    if 'username' not in session:
+        return redirect('/login')
     news = NewsModel(db.get_connection()).get_all(session['user_id'])
     return render_template('index.html', news=news) # username=session['username']
 
