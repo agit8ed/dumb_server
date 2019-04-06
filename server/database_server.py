@@ -14,12 +14,18 @@ UsersModel(db.get_connection()).init_table()
 
 # http://127.0.0.1:8080/login
 
+@app.route('/userbase')
+def userbase():
+    users = UsersModel(db.get_connection()).get_all()
+    return render_template('index.html', news=users)
+
+@app.route('/')
 @app.route('/index')
 def index():
     '''if 'username' not in session:
-        return redirect('/login')'''
-    news = NewsModel(db.get_connection()).get_all(session['user_id'])
-    return render_template('index.html', news=news) # username=session['username']
+        username="Guest"'''
+    news = NewsModel(db.get_connection()).get_all()
+    return render_template('index.html', news=news)  # username=session['username']
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -43,7 +49,7 @@ def login():
 def logout():
     session.pop('username', 0)
     session.pop('user_id', 0)
-    return redirect('/login')
+    return redirect('/index')
 
 
 @app.route('/signup', methods=['GET', 'POST'])
@@ -53,18 +59,16 @@ def signup():
         user_name = form.username.data
         password = form.password.data
         user_model = UsersModel(db.get_connection())
-        exists = user_model.exists(user_name, password)
-        if exists[1]:
-            user_model.insert(user_name, password)
-            return redirect("/login")
-    return render_template("login.html", title="Регистрация", form=form)
+        # exists = user_model.exists(user_name, password)
+        user_model.insert(user_name, password)
+        return redirect("/login")
+    return render_template("signup.html", title="Регистрация", form=form)
 
 
-@app.route('/')
 @app.route('/add_news', methods=['GET', 'POST'])
 def add_news():
-    '''if 'username' not in session:
-        return redirect('/login')'''
+    if 'username' not in session:
+        return redirect('/login')
     form = AddNewsForm()
     if form.validate_on_submit():
         title = form.title.data
@@ -77,8 +81,8 @@ def add_news():
 
 @app.route('/delete_news/<int:news_id>', methods=['GET'])
 def delete_news(news_id):
-    '''if 'username' not in session:
-        return redirect('/login')'''
+    if 'username' not in session:
+        return redirect('/login')
     nm = NewsModel(db.get_connection())
     nm.delete(news_id)
     return redirect("/index")
